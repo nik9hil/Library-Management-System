@@ -1,0 +1,347 @@
+import java.lang.*;
+import java.util.*;
+import java.text.SimpleDateFormat;
+   
+class vect{
+static Vector<User> a = new Vector<User>();
+static Vector<Book> v = new Vector<Book>();
+}
+public class Main
+{
+
+public static void main(String args[])
+    {
+        Scanner sc=new Scanner(System.in);
+        Librarian l=new Librarian(); 
+        Catalogue ca= new Catalogue();
+            int c; 
+            System.out.println("MENU");
+            System.out.println("1: ADD BOOK");
+            System.out.println("2: DELETE BOOK");
+            System.out.println("3: ADD USER");
+            System.out.println("4: DELETE USER");
+            System.out.println("5: SEARCH FOR BOOK");
+            System.out.println("6: ISSUE BOOK");
+            System.out.println("7: RETURN BOOK");
+            System.out.println("8: EXIT");
+            do
+            {
+            System.out.print("Enter the choice: ");
+            c=sc.nextInt();
+            switch(c)
+            {
+                case 1:
+                l.add();
+                break;
+
+                case 2:
+                System.out.print("Enter the id of the book: ");
+                int id=sc.nextInt();
+                l.delete(id);
+                break;
+
+                case 3:
+                l.addUser();
+                break;
+
+                case 4:
+                l.deleteUser();
+                break;
+
+                case 5:
+                System.out.println("1. Search by name\n2. Search by ID\n");
+                int ch=sc.nextInt();
+                if(ch==1)
+                {
+                System.out.print("Enter the name of the Book: ");
+                sc.nextLine();
+                String name=sc.nextLine();
+                ca.search(name);
+                }
+                else 
+                {
+                System.out.print("Enter the id of the Book: ");
+                int i=sc.nextInt();
+                ca.search(i);
+                }
+                break;
+
+                case 6:
+                System.out.print("Enter the id of the Book: ");
+                int i=sc.nextInt();
+                l.issue(i);
+                break;
+
+                case 7:
+                System.out.print("Search by name or id?(1/2): ");
+                break;
+
+                case 8:
+                System.out.println("EXIT!!!");
+                break;
+
+            }
+            }while(c!=8);    
+        }
+    }
+
+    class Catalogue extends vect
+    {
+    public Book search(int id)
+    {
+        int flag=0;
+        Book temp = new Book();
+        //System.out.println(v.size());
+        for(int i=0; i<v.size(); i++)
+        {
+        temp = v.get(i);      
+        if(temp.id == id)
+        {
+            flag=1;
+            System.out.println("Found !");
+            System.out.println("Name of Book: " + temp.name+ "\nId: " + temp.id + "\nNo. of copies: " + temp.copies_avail );
+            return temp;
+        }
+        }
+        if(flag==0)
+        System.out.println("Not found");
+        return temp;
+    }
+    public Book search(String find)
+    {
+        int flag=0;
+        Book temp = new Book();
+        for(int i=0; i<v.size(); i++)
+        {
+        temp = v.get(i);
+        //System.out.println(v.get(i).name);      
+        if(temp.name.equals(find))
+        {      
+            flag=1;
+            System.out.println("Found !");
+            System.out.println("Name of Book: " + temp.name+ "\nId: " + temp.id + "\nNo. of copies: " + temp.copies_avail );
+            return temp;
+        }
+        if(flag==0)
+            System.out.print("Not found");
+        }
+        return temp;
+    }
+    }
+
+    class Book
+    {
+        String name;
+        int id;
+        int copies;
+        int copies_avail;
+        boolean issuable;
+    public Book()
+    {
+        name = "";
+        id = 0;
+        copies = 0;
+        issuable = false;
+    }
+    public void canIssue()
+    {
+        if(copies - copies_avail > 0)
+        issuable = true;
+        else 
+        issuable = false;
+    }
+    }
+
+    class Librarian extends vect
+    {
+        int admin;
+    public void add()
+    {
+    Scanner s = new Scanner(System.in);
+    Book b = new Book();
+        int flag = 0;
+        System.out.println("Enter the book name:");
+        b.name = s.nextLine();
+        //sc.nextLine();
+        for(int i=0; i<v.size(); i++)
+        {
+            if(v.get(i).name.equals(b.name))
+            {
+                System.out.print("Books Exists. How many copies would you like to add? ");
+                b=v.get(i);
+                b.copies += s.nextInt();
+                b.copies_avail = b.copies;
+                v.setElementAt(b,i);
+                flag = 1;
+            }
+        }
+        if(flag==0)
+        {
+            System.out.print("Enter the book ID:");
+            b.id = s.nextInt();
+            System.out.print("Enter the book Copies:");
+            b.copies = s.nextInt();
+            b.copies_avail = b.copies;
+            b.issuable = true;
+            v.addElement(b);
+        }
+        System.out.println("Book Added!");
+    }
+    public void delete(int id)
+    {
+        for(int i=0; i<v.size(); i++)
+        {
+            if(v.get(i).id == id)
+            {
+                v.remove(i);
+                break;
+            }
+        }
+        System.out.println("Book Removed!");
+    }	
+    public void addUser()
+    {
+        Scanner sc = new Scanner(System.in);
+        User u = new User();
+        int flag = 0;
+        System.out.println("Enter the User Name:");
+        u.name = sc.nextLine();
+        for(int i=0; i< a.size(); i++)
+        {
+        if(a.get(i).name.equals(u.name))
+        {
+            System.out.print("User Exists.");
+            flag = 1;
+        }
+        }
+        if(flag==0)
+        {
+        System.out.println("Enter the Designation:");
+        u.designation=sc.nextLine();
+        System.out.println("Enter the ID:");
+        u.userid=sc.nextInt();
+        System.out.println("Enter the Age:");
+        u.age=sc.nextInt();
+        u.calcMax();
+        u.finePending=0; 
+        u.issue = 0;
+        a.addElement(u);
+        System.out.println("New User Added!");
+        }
+        
+    }
+    public void deleteUser()
+    {
+            Scanner sc = new Scanner(System.in);
+        System.out.println("Name of the User:");
+        String name = sc.nextLine();
+        for(int i=0; i< a.size(); i++)
+        {
+        if(a.get(i).name.equals(name))
+        {
+            a.removeElementAt(i);
+            break;
+        }
+        }
+    }
+    void issue(int id)
+    {
+        User x= new User();
+        Scanner sc = new Scanner(System.in);
+        //Fine f;
+        for(int i=0; i<a.size(); i++)
+        {
+        if(v.get(i).id == id)
+        {
+            System.out.print("\nEnter username: ");
+            //sc.nextLine();
+            String s = sc.nextLine();
+            int flag = 0;
+            for(int j=0; j<a.size(); j++)
+            {
+                if(a.get(j).name.equals(s))
+                {
+                    x = a.get(j);
+                    if(x.issue < x.maxIssue && v.get(i).copies_avail > 0)
+                    {
+                        a.get(j).dateIssue[x.issue] = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+                        a.get(j).idIssue[x.issue] = v.get(i).id;
+                        a.get(j).issue++;
+                        v.get(i).copies_avail--;
+                    //delete(id);
+                        System.out.println("SUCCESSFUL!");
+                        break;
+                    }
+                    else
+                        System.out.println("Exceeded the limit!");
+                }       
+                else
+                    System.out.println("User not found");
+            }
+        }
+        else
+            System.out.println("Book not found");
+        }    
+    }
+    void retur(int id)
+    {
+        
+        //add();
+        User x=new User();
+        int i;
+        for(i=0; i<a.size(); i++)
+        {
+            if(id == a.get(i).userid)
+            {
+                x = a.get(i);
+                break;
+            }
+        }
+        int idBook;
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter id of book to return: ");
+        idBook = sc.nextInt();
+        for(int j=0; j < v.size(); j++)
+            if(v.get(j).id == idBook)
+            {
+                v.get(j).copies_avail++;
+                for(int k=0; k < x.idIssue.length; k++)
+                {
+                    if(x.idIssue[k] == idBook)
+                    {
+                        a.get(i).idIssue[k] = 0;
+                        break;
+                    }
+                }
+            }
+        //x.dateReturn[x.rissue]=new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+        //x.rissue++;
+    }
+    
+    }
+
+    interface Fine
+    {
+    String dateToday = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+    int fine=100;
+    }
+
+    class User implements Fine
+    {
+    String name,designation;
+    int userid,age,maxIssue = 0,issue=0,rissue=0,finePending,j;
+    //int idIssue[];
+    String dateIssue[]; 
+    String dateReturn[];
+    int idIssue[];
+    public void calcMax()
+    {
+        if(designation.equals("Student"))
+            maxIssue = 3;
+        else if(designation.equals("Teaching"))
+            maxIssue = 6;
+        dateIssue = new String[maxIssue];
+        dateReturn = new String[maxIssue];
+        idIssue = new int[maxIssue]; 
+    }
+    }
